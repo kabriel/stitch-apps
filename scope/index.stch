@@ -1,0 +1,14 @@
+app = ui.app {
+    name: "scope"
+    page( user role delta ): main_page
+}
+core.export{ name:"app" def:app }
+
+main_page = ui.page {
+    title: "Stitch Scope"
+    content: ui.text {
+        val: "Stitch Scope"
+        variant: "h4"
+        align: "center"
+    }
+}
