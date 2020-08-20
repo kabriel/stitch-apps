@@ -148,6 +148,16 @@ model_page( modelName ) = ui.page {
                     model: modelName
                     item
                 }
+                content: ui.pane {
+                    paddingLeft: "10px"
+                    alignSelf: "center"
+                        content: ui.text {
+                        val: core.val {
+                            src: item
+                            name: "name"
+                        }
+                    }
+                }
             }
         }
     }
@@ -299,16 +309,33 @@ render_link_one_item( item field ) = ui.pane {
 
 render_link_many_item( item field ) = ui.pane {
     flex: 1
-    content: ui.text {
-        val: "["
-        val: data.count {
-            ref: item 
-            field: core.val {
+    flexDirection: "column"
+    content: core.map {
+        collection: core.val {
+            src: item
+            name: core.val {
                 src: field
                 name: "name"
             }
         }
-        val: "]"
+        iterator( item:ref ): ui.pane {
+            content: ui.button {
+                val: core.val {
+                    src: ref
+                    name: "_model"
+                }
+                val: ":"
+                val: core.val {
+                    src: ref
+                    name: "_id"
+                }
+                event: "view.model"
+                model: core.val {
+                    src: ref
+                    name: "_model"
+                }
+            }
+        }
     }
 }
 
