@@ -271,6 +271,7 @@ render_link_one_item( item field ) = ui.pane {
                 }
                 name: "_id"
             }
+            val: ">"
             event: "view.item"
             model: core.val {
                 src: core.val {
