@@ -320,6 +320,7 @@ render_link_many_item( item field ) = ui.pane {
         }
         iterator( item:ref ): ui.pane {
             content: ui.button {
+                val: "<"
                 val: core.val {
                     src: ref
                     name: "_model"
@@ -329,6 +330,7 @@ render_link_many_item( item field ) = ui.pane {
                     src: ref
                     name: "_id"
                 }
+                val: ">"
                 event: "view.model"
                 model: core.val {
                     src: ref
