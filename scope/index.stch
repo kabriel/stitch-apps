@@ -331,10 +331,14 @@ render_link_many_item( item field ) = ui.pane {
                     name: "_id"
                 }
                 val: ">"
-                event: "view.model"
+                event: "view.item"
                 model: core.val {
                     src: ref
                     name: "_model"
+                }
+                item: core.val {
+                    src: ref
+                    name: "_id"
                 }
             }
         }
