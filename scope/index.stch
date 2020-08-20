@@ -1,14 +1,408 @@
+init = core.seq {
+    body: data.model {
+        name: "scope"
+        field: {
+            name: "users"
+            type: "link"
+            model: "scope.user"
+            cardinality: "many"
+        }
+    }
+
+    body: data.model {
+        name: "scope.user"
+        field: {
+            name: "owner"
+            type: "link"
+            model: "stch.user"
+            cardinality: "one"
+            required: true
+            immutable: true
+            unique: true
+        }
+        field: {
+            name: "scope"
+            type: "link"
+            model: "scope"
+            cardinality: "one"
+            immutable: true
+            required: true
+        }
+        field: {
+            name: "model"
+            type: "text"
+        }
+        field: {
+            name: "item"
+            type: "text"
+        }
+    }
+}
+core.export{ name:"init" def:init }
+
+get_scope
+
 app = ui.app {
     name: "scope"
-    page( user role delta ): main_page
+    page( user ): router{ user }
+    event: ui.event {
+        name: "view.home"
+        handler( user inv ): set_nav_home { user }
+    }
+    event: ui.event {
+        name: "view.model"
+        handler( user inv ): set_nav_model { 
+            user 
+            model: grid.argument{ inv name:"model" } 
+        }
+    }
+    event: ui.event {
+        name: "view.item"
+        handler( user inv ): set_nav_item { 
+            user 
+            model: grid.argument{ inv name:"model" } 
+            item: grid.argument{ inv name:"item" } 
+        }
+    }
 }
 core.export{ name:"app" def:app }
 
-main_page = ui.page {
+router( user ) = core.cond {
+    if: get_scope_user_item{ user }
+    then: item_page{ 
+        pageItem: data.get { 
+            model: get_scope_user_model{ user}
+            id: get_scope_user_item{ user } 
+        } 
+    }
+    else: core.cond {
+        if: get_scope_user_model{ user }
+        then: model_page{ modelName:get_scope_user_model{ user } }
+        else: models_page
+    }
+}
+
+models_page = ui.page {
     title: "Stitch Scope"
     content: ui.text {
         val: "Stitch Scope"
+        variant: "h3"
+        align: "center"
+    }
+    content: ui.pane {
+        height: "30px"
+    }
+    content: ui.pane {
+        flexDirection: "column"
+        alignItems: "center" 
+        content: core.map {
+            collection: data.describe{ name:"models" }
+            iterator( item ): ui.pane {
+                content: ui.button {
+                    val: core.val {
+                        src: item
+                        name: "name"
+                    }
+                    event: "view.model"
+                    model: core.val {
+                        src: item
+                        name: "name"
+                    }
+                }
+            }
+        }
+    }
+}
+
+model_page( modelName ) = ui.page {
+    title: "Stitch Scope"
+    content: ui.text {
+        val: "Stitch Scope"
+        variant: "h3"
+        align: "center"
+    }
+    content: ui.text {
+        val: modelName
         variant: "h4"
         align: "center"
     }
+    content: ui.pane {
+        height: "30px"
+    }
+    content: ui.pane {
+        flexDirection: "column"
+        alignItems: "center"
+        content: ui.pane {
+            content: ui.button {
+                val: "Home"
+                event: "view.home"
+            }
+        }
+        content: core.map {
+            collection: data.find{ model:modelName }
+            iterator( item ): ui.pane {
+                content: ui.button {
+                    val: core.val {
+                        src: item
+                        name: "_id"
+                    }
+                    event: "view.item"
+                    model: modelName
+                    item
+                }
+            }
+        }
+    }
+}
+
+item_page( pageItem ) = ui.page {
+    title: "Stitch Scope"
+    content: ui.text {
+        val: "Stitch Scope"
+        variant: "h3"
+        align: "center"
+    }
+    content: ui.text {
+        val: "<"
+        val: core.val{ src:pageItem name:"_model"}
+        val: ":"
+        val: core.val{ src:pageItem name:"_id" }
+        val: ">"
+        variant: "h4"
+        align: "center"
+    }
+    content: ui.pane {
+        height: "30px"
+    }
+    content: ui.pane {
+        alignItems: "stretch"
+        flexDirection: "column"
+        alignItems: "center" 
+        content: ui.pane {
+            alignSelf: "center"
+            content: ui.button {
+                val: "Home"
+                event: "view.home"
+            }
+            content: ui.button {
+                val: core.val{ src:pageItem name:"_model" }
+                event: "view.model"
+                model: core.val{ src:pageItem name:"_model" }
+            }
+        }
+        content: core.map {
+		    collection: data.describe{ name:"fields" model:core.val{ src:pageItem name:"_model" } }
+            iterator( item ): render_item{ item:pageItem field:item }
+        }
+    }
+}
+
+render_item( item field ) = ui.pane {
+    flex: 1
+    content: ui.pane {
+        flex: 1
+        justifyContent: "flex-end"
+        paddingRight: "10px"
+        alignSelf: "center"
+        content: ui.text {
+            val: core.val {
+                src: field
+                name: "name"
+            }
+            val: ": "
+        }
+    }
+    content: core.cond {
+        if: core.match{ source:core.val{ src:field name:"type" } target:"link" }
+        then: render_link_item{ item field }
+        else: render_value_item{ item field }
+    }
+}
+
+
+render_value_item( item field ) = ui.pane {
+    flex: 1
+    overflow: "scroll"
+    content: ui.text {
+        val: core.val {
+            src: item
+            name: core.val {
+                src: field 
+                name: "name"
+            }
+        }
+    }
+}
+
+render_link_item( item field ) = core.cond {
+    if: core.match{ source:core.val{ src:field name:"cardinality" } target:"many" }
+    then: render_link_many_item{ item field }
+    else: render_link_one_item{ item field } 
+}
+
+render_link_one_item( item field ) = ui.pane {
+    flex: 1
+    content: core.cond {
+        if: core.val {
+            src: item
+            name: core.val {
+                src: field
+                name: "name"
+            }
+        }
+        then: ui.button {
+            val: "<"
+            val: core.val {
+                src: core.val {
+                    src: item
+                    name: core.val {
+                        src: field
+                        name: "name"
+                    }
+                }
+                name: "_model"
+            }
+            val: ":"
+            val: core.val {
+                src: core.val {
+                    src: item
+                    name: core.val {
+                        src: field
+                        name: "name"
+                    }
+                }
+                name: "_id"
+            }
+            event: "view.item"
+            model: core.val {
+                src: core.val {
+                    src: item
+                    name: core.val {
+                        src: field
+                        name: "name"
+                    }
+                }
+                name: "_model"
+            }
+            item: core.val {
+                src: core.val {
+                    src: item
+                    name: core.val {
+                        src: field
+                        name: "name"
+                    }
+                }
+                name: "_id"
+            }
+        }
+    }
+}
+
+render_link_many_item( item field ) = ui.pane {
+    flex: 1
+    content: ui.text {
+        val: "["
+        val: data.count {
+            ref: item 
+            field: core.val {
+                src: field
+                name: "name"
+            }
+        }
+        val: "]"
+    }
+}
+
+get_scope = data.set {
+    def: {
+        id: "scope"
+        model: "scope"
+    }
+}
+
+get_scope_user( user ) = data.set {
+    def: {
+        name: "user-a"
+        model: "scope.user"
+        find: {
+            fields: {
+                owner: user        
+                scope: "scope"
+            }
+        }
+        create: {
+            owner: user
+            scope: "scope"
+        }
+    }
+    def: {
+        id: "scope"
+        model: "scope"
+        add: {
+            users: "user-a"
+        }
+    }
+}
+
+set_nav_home( user ) = data.set {
+    def: {
+        name: "user-a"
+        model: "scope.user"
+        find: {
+            fields: {
+                owner: user        
+                scope: "scope"
+            }
+        }
+        remove: {
+            model: true
+            item: true
+        }
+    }
+}
+
+set_nav_model( user model ) = data.set {
+    def: {
+        name: "user-a"
+        model: "scope.user"
+        find: {
+            fields: {
+                owner: user        
+                scope: "scope"
+            }
+        }
+        update: {
+            model
+        }
+        remove: {
+            item: true
+        }
+    }
+}
+
+set_nav_item( user model item ) = data.set {
+    def: {
+        name: "user-a"
+        model: "scope.user"
+        find: {
+            fields: {
+                owner: user        
+                scope: "scope"
+            }
+        }
+        update: {
+            model
+            item
+        }
+    }
+}
+
+get_scope_user_model( user ) = core.val {
+    src: get_scope_user{ user }
+    name: "model"
+}
+
+get_scope_user_item( user ) = core.val {
+    src: get_scope_user{ user }
+    name: "item"
 }

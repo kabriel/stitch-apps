@@ -1,4 +1,6 @@
 core.import{ namespace:"main" source:"index.stch" }
+main.init
+
 http.listen {
     port: 8000
     handler: ui.handler
