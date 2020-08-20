@@ -8,7 +8,6 @@ init = core.seq {
             cardinality: "many"
         }
     }
-
     body: data.model {
         name: "scope.user"
         field: {
@@ -37,10 +36,9 @@ init = core.seq {
             type: "text"
         }
     }
+    body: get_scope
 }
 core.export{ name:"init" def:init }
-
-get_scope
 
 app = ui.app {
     name: "scope"
