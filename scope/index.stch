@@ -349,6 +349,7 @@ get_scope = data.set {
     def: {
         id: "scope"
         model: "scope"
+        create: {}
     }
 }
 
