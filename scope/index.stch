@@ -42,7 +42,11 @@ core.export{ name:"init" def:init }
 
 app = ui.app {
     name: "scope"
-    page( user ): router{ user }
+    pageName( user ): router{ user }
+    page( user ): models_page
+    page( user ): model_page{ user }
+    page( user ): item_page{ user }
+
     event: ui.event {
         name: "view.home"
         handler( user inv ): set_nav_home { user }
@@ -67,21 +71,17 @@ core.export{ name:"app" def:app }
 
 router( user ) = core.cond {
     if: get_scope_user_item{ user }
-    then: item_page{ 
-        pageItem: data.get { 
-            model: get_scope_user_model{ user}
-            id: get_scope_user_item{ user } 
-        } 
-    }
+    then: "item"
     else: core.cond {
         if: get_scope_user_model{ user }
-        then: model_page{ modelName:get_scope_user_model{ user } }
-        else: models_page
+        then: "model"
+        else: "models"
     }
 }
 
 models_page = ui.page {
     title: "Stitch Scope"
+    name: "models"
     content: ui.text {
         val: "Stitch Scope"
         variant: "h3"
@@ -112,15 +112,16 @@ models_page = ui.page {
     }
 }
 
-model_page( modelName ) = ui.page {
+model_page( user ) = ui.page {
     title: "Stitch Scope"
+    name: "model"
     content: ui.text {
         val: "Stitch Scope"
         variant: "h3"
         align: "center"
     }
     content: ui.text {
-        val: modelName
+        val: get_scope_user_model{ user }
         variant: "h4"
         align: "center"
     }
@@ -137,7 +138,7 @@ model_page( modelName ) = ui.page {
             }
         }
         content: core.map {
-            collection: data.find{ model:modelName }
+            collection: data.find{ model:get_scope_user_model{ user } }
             iterator( item ): ui.pane {
                 content: ui.button {
                     val: core.val {
@@ -145,7 +146,7 @@ model_page( modelName ) = ui.page {
                         name: "_id"
                     }
                     event: "view.item"
-                    model: modelName
+                    model: get_scope_user_model{ user }
                     item
                 }
                 content: ui.pane {
@@ -163,8 +164,9 @@ model_page( modelName ) = ui.page {
     }
 }
 
-item_page( pageItem ) = ui.page {
+item_page( user ) = ui.page {
     title: "Stitch Scope"
+    name: "item"
     content: ui.text {
         val: "Stitch Scope"
         variant: "h3"
@@ -172,9 +174,9 @@ item_page( pageItem ) = ui.page {
     }
     content: ui.text {
         val: "<"
-        val: core.val{ src:pageItem name:"_model"}
+        val: core.val{ src:get_scope_user_data{ user } name:"_model"}
         val: ":"
-        val: core.val{ src:pageItem name:"_id" }
+        val: core.val{ src:get_scope_user_data{ user } name:"_id" }
         val: ">"
         variant: "h4"
         align: "center"
@@ -193,14 +195,14 @@ item_page( pageItem ) = ui.page {
                 event: "view.home"
             }
             content: ui.button {
-                val: core.val{ src:pageItem name:"_model" }
+                val: core.val{ src:get_scope_user_data{ user } name:"_model" }
                 event: "view.model"
-                model: core.val{ src:pageItem name:"_model" }
+                model: core.val{ src:get_scope_user_data{ user } name:"_model" }
             }
         }
         content: core.map {
-		    collection: data.describe{ name:"fields" model:core.val{ src:pageItem name:"_model" } }
-            iterator( item ): render_item{ item:pageItem field:item }
+		    collection: data.describe{ name:"fields" model:core.val{ src:get_scope_user_data{ user } name:"_model" } }
+            iterator( item ): render_item{ item:get_scope_user_data{ user } field:item }
         }
     }
 }
@@ -439,3 +441,8 @@ get_scope_user_item( user ) = core.val {
     src: get_scope_user{ user }
     name: "item"
 }
+
+get_scope_user_data( user ) = data.get { 
+    model: get_scope_user_model{ user }
+    id: get_scope_user_item{ user } 
+} 
