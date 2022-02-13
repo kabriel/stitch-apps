@@ -1,0 +1,13 @@
+core.import{ namespace:"main" source:"index.stch" }
+main.init
+
+http.listen {
+    port: 8000
+    handler: ui.handler
+    handler: grid.handler {
+        ready( router ): ui.register { 
+            router 
+            app: main.app
+        }
+    }
+}

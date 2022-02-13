@@ -1,0 +1,45 @@
+page( user ) = ui.page {
+    name: "auth"
+    title: "Collect"
+    content: content {
+        profile: model.get_profile_by_user{ user }
+    }
+}
+core.export{ name:"page" def:page }
+
+content( profile ) = ui.pane {
+    flexDirection: "column"
+    alignItems: "center"
+    marginTop: "50px"
+    content: ui.pane {
+        flexDirection: "column"
+        alignItems: "center"
+        content: ui.text {
+            variant: "h2"
+            val: "Welcome!"
+        }
+        content: ui.pane {
+            marginTop: "100px"
+            content: ui.text {
+                variant: "h5"
+                val: "Who are you?"
+            }
+        }
+    }
+    content: ui.pane {
+        marginTop: "20px"
+        content: ui.input{ 
+            label: "Your Name" 
+            event: "switch_auth" 
+            autoFocus: true
+            clearOnSubmit: true
+        }
+    }
+    content: ui.pane {
+        content: ui.link {
+            val: "host sign-in"
+            event: "auth"
+            provider: "twitter"
+        }
+    }
+}

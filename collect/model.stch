@@ -1,0 +1,76 @@
+prefix = "collect"
+
+// 
+ent( name ) = core.string{ val:prefix val:"." val:name }
+core.export{ name:"ent" def:ent }
+
+//
+init = core.seq {
+    // profile
+    body: data.model {
+        name: ent{ name:"profile" }
+        field: {
+            name: "owner"
+            type: "link"
+            model: "stch.user"
+            cardinality: "one"
+            required: true
+            unique: true
+        }
+        field: {
+            name: "current_page"
+            type: "text"
+        }
+        field: {
+            name: "current_id"
+            type: "text"
+        }
+    }
+}
+core.export{ name:"init" def:init }
+
+// ----------------------------------------------------------------------------
+
+// PROFILE
+
+//
+get_profiles = data.find { 
+    model: model.ent{ name:"profile" }
+}
+core.export{ name:"get_profiles" def:get_profiles }
+
+//
+get_profile_by_user( user ) = data.set {
+    def: {
+        model: ent{ name:"profile" }
+        find: {
+            fields: {
+                owner: user
+            }
+        }
+        create: {
+            owner: user
+        }
+    }
+}
+core.export{ name:"get_profile_by_user" def:get_profile_by_user }
+
+//
+get_profile_by_id( id ) = data.get {
+    model: ent{ name:"profile" }
+    id
+}
+core.export{ name:"get_profile_by_id" def:get_profile_by_id }
+
+// 
+get_profile_by_email( email ) = get_profile_by_user {
+    user: data.get {
+        model: "stch.user"
+        find: {
+            fields: {
+                email
+            }
+        }
+    }
+}
+core.export{ name:"get_profile_by_email" def:get_profile_by_email }

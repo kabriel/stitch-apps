@@ -1,0 +1,31 @@
+core.import{ namespace:"scope" source:"https://api.github.com/repos/kabriel/stitch-apps/contents/scope/index.stch" }
+core.import{ namespace:"model" source:"model.stch" } 
+core.import{ namespace:"app" source:"app.stch" }
+
+scope.init
+model.init
+
+host_email = core.param{ name:"adminEmail" default:"zombie@robichaux.com" }
+
+http.listen {
+    port: 8000
+    handler: ui.handler
+    handler: grid.handler {
+        //baseUrl: core.param{ name:"baseUrl" default:"http://localhost:8000" }
+        baseUrl: "http://10.0.0.195.nip.io:8000"
+        provider: user.provider {
+            name: "twitter"
+            key: "JM3Ha3DgdRkAqinXib1vICXBv"
+            secret: "x2K6dAPEKQmQuHyJPwj9DRq7GoFHF3rs9VRsPqgv5Kr91ywU5L"
+        }
+        allowAuth( user ): core.match {
+            source: core.val{ src:user name:"email" }
+            target: host_email
+        }
+        ready( router ): ui.register { 
+            router 
+            app: app.main
+            app: scope.app
+        }
+    }
+}

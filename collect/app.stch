@@ -1,0 +1,225 @@
+core.import{ namespace:"home" source:"./screens/home.stch" }
+core.import{ namespace:"host" source:"./screens/host.stch" }
+core.import{ namespace:"auth" source:"./screens/auth.stch" }
+
+
+main( user ) = ui.app {
+    name: "collect"    
+
+    //pageName: "auth"
+    pageName: is_authed {
+        yes: core.cond {
+            if: core.exists { 
+                val: core.val {
+                    src: model.get_profile_by_user{ user }
+                    name: "current_page"
+                }
+            }
+            then: core.val {
+                src: model.get_profile_by_user{ user }
+                name: "current_page"
+            }
+            else: is_host {
+                yes: "host"
+                no: "home"
+            }
+        }
+        no: "auth"
+    }
+
+
+    // nav
+    //nav: core.match{ source:role target:"user" }
+
+    // pages
+    
+    // auth
+    /*
+    page: is_mobile {
+        yes: is_authed {
+            no: mobile_auth.page
+        } 
+    }
+    */
+    // home
+    page: home.page
+
+    // host
+    page: host.page
+
+    // auth
+    page: auth.page
+    
+
+    /*
+    is_mobile {
+        yes: is_authed {
+            yes: mobile_home.page
+        } 
+    }
+    */
+
+
+    /*
+    // theme
+    theme: ui.theme {
+        palette: {
+            primary: "#59E0C3"
+            secondary: "#F86666"
+            background: {
+                dark: "#1C1C1C"
+                main: "#FBFAFF"
+                light: "#FFFFFF"
+            }
+        }
+        typography: {
+            h1: {
+                fontSize: 48
+                fontWeight: 600
+                fontFamily: "Montserrat"
+                lineHeight: 1.5
+
+
+            }
+            h2: {
+                fontSize: 24
+                fontWeight: 600
+                fontFamily: "Montserrat"
+                lineHeight: 1.5
+            }
+            h3: {
+                fontSize: 18
+                fontWeight: 300
+                fontFamily: "Montserrat"
+                lineHeight: 1.5
+            }
+            h4: {
+                fontSize: 13
+                fontWeight: 300
+                lineHeight: 1.5
+            }
+            h5: {
+                fontSize: 13
+                fontWeight: 300
+                lineHeight: 1.5
+            }
+            h6: {
+                fontSize: 13
+                fontWeight: 700
+                lineHeight: 1.5
+            }
+            body1: {
+                fontWeight: 300
+                fontSize: 17
+                lineHeight: 1.5
+            }
+            body2: {
+                fontWeight: 500
+                fontSize: 17
+                lineHeight: 1.5
+            }
+        }
+        */
+
+
+    event: ui.event {
+        name: "switch_auth"
+        handler( user inv ): grid.auth {
+            connectedUser: user
+            user: user.create {
+                name: grid.argument{ inv name:"value" }
+            }
+        }
+    }
+
+    /*
+    event: ui.event {
+        name: "nav_article"
+        trigger_url: "mobile_article"
+        handler( user inv ): model.set_context_article { 
+            article: grid.argument{ inv name:"value" }
+            profile: model.get_profile{ user }
+        }
+    }
+    event: ui.event {
+        name: "nav_app"
+        trigger_url: "mobile_app"
+        handler( user inv ): model.set_context_app { 
+            app: grid.argument{ inv name:"value" }
+            profile: model.get_profile{ user }
+        }
+    }
+    event: ui.event {
+        name: "nav_conversation"
+        trigger_url: "mobile_conversation"
+        handler( user inv ): model.set_context_conversation { 
+            conversation: core.cond {
+                if: core.exists {
+                    val: grid.argument{ inv name:"value" }
+                }
+                then: model.get_conversation {
+                    profile: grid.argument{ inv name:"value" }
+                }
+                else: model.get_conversation {
+                    profile: model.get_profile{ user }
+                }
+            } 
+            profile: model.get_profile{ user }
+        }
+    }
+    event: ui.event {
+        name: "create_message"
+        handler( user inv ): model.create_message {
+            conversation: core.val {
+                src: model.get_profile{ user }
+                name: "conversation"
+            }
+            profile: model.get_profile{ user }
+            text: grid.argument{ inv name:"value" }
+        }
+    }
+    event: ui.event {
+        name: "create_my_message"
+        handler( user inv ): model.create_message {
+            conversation:  model.get_conversation {
+                profile: model.get_profile{ user }
+            }
+            profile: model.get_profile{ user }
+            text: grid.argument{ inv name:"value" }
+        }
+    }
+    */
+}
+core.export{ name:"main" def:main }
+
+is_authed( yes no ) = core.cond {
+    if: core.match{ source:role target:"user" }
+    then: yes
+    else: no
+} 
+
+is_host( yes no ) = core.cond {
+    if: core.match { 
+        source: core.val {
+            src: user
+            name: "email"
+        } 
+        target: host_email
+    }
+    then: yes
+    else: no
+}
+
+/*
+is_mobile( yes no ) = core.cond {
+    if: core.match{ source:platform target:"mobile" }
+    then: yes
+    else: no
+}
+
+is_embedded( yes no ) = core.cond {
+    if: embedded
+    then: yes
+    else: no
+}
+*/
