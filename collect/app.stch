@@ -132,6 +132,28 @@ main( user ) = ui.app {
         }
     }
 
+    event: ui.event {
+        name: "create_topic"
+        handler( user inv ): model.create_topic {
+            text: grid.argument{ inv name:"value" }
+        }
+    }
+
+    event: ui.event {
+        name: "remove_topic"
+        handler( user inv ): model.remove_topic_by_id {
+            id: grid.argument{ inv name:"value" }
+        }
+    }
+
+    event: ui.event {
+        name: "update_topic"
+        handler( user inv ): model.update_topic {
+            id: grid.argument{ inv name:"topic" }
+            text: grid.argument{ inv name:"value" }
+        }
+    }
+
     /*
     event: ui.event {
         name: "nav_article"

@@ -31,13 +31,98 @@ content( profile ) = ui.pane {
             }
         }
     }
-    /*
-    content: ui.pane {
-        content: ui.link {
-            val: "switch"
-            event: "switch_auth"
-            value: "123"
+    content: create_topic
+    content: topic_list
+}
+
+create_topic = ui.pane {
+    content: ui.stack {
+        name: "topic_create"
+        layer1: ui.pane {
+            content: ui.link {
+                val: "create"
+                event: "bus:topic_create_layer2"
+            }
+        }
+        layer2: ui.pane {
+            content: ui.input{ 
+                label: "Topic Text" 
+                event: "create_topic" 
+                event: "bus:topic_create_layer1"
+                autoFocus: true
+                clearOnSubmit: true
+            }
+            content: ui.link {
+                val: "close"
+                event: "bus:topic_create_layer1"
+            }
         }
     }
-    */
+}
+
+topic_list = ui.pane {
+    flexDirection: "column"
+    content: ui.text {
+        val: "Topics"
+    }
+    content: core.map {
+        collection: model.get_topics
+        iterator( item ): topic_element{ topic:item }
+    }
+}
+
+topic_element( topic ) = ui.stack {
+    name: "view_topic"
+    name: topic
+    layer1: view_topic{ topic }
+    layer2: edit_topic{ topic }
+}
+
+view_topic( topic ) = ui.pane {
+    content: ui.text {
+        val: core.val {
+            src: topic
+            name: "text"
+        }
+    }
+    content: ui.link {
+        val: "[delete]"
+        event: "remove_topic"
+        value: topic
+    }
+    content: ui.link {
+        val: "[edit]"
+        event: core.string {
+            val: "bus:view_topic_"
+            val: topic
+            val: "_layer2"
+        }
+    }
+}
+
+edit_topic( topic ) = ui.pane {
+    content: ui.input{ 
+        label: "Topic Text" 
+        value: core.val {
+            src: topic
+            name: "text"
+        }
+        topic
+        event: "update_topic" 
+        event: core.string {
+            val: "bus:view_topic_"
+            val: topic
+            val: "_layer1"
+        }
+        autoFocus: true
+        clearOnSubmit: true
+    }
+    content: ui.link {
+        val: "[cancel]"
+        event: core.string {
+            val: "bus:view_topic_"
+            val: topic
+            val: "_layer1"
+        }
+    }
 }

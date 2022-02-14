@@ -26,11 +26,18 @@ init = core.seq {
             type: "text"
         }
     }
+    // topic
+    body: data.model {
+        name: ent{ name:"topic" }
+        field: {
+            name: "text"
+            type: "text"
+        }
+    }
 }
 core.export{ name:"init" def:init }
 
 // ----------------------------------------------------------------------------
-
 // PROFILE
 
 //
@@ -74,3 +81,57 @@ get_profile_by_email( email ) = get_profile_by_user {
     }
 }
 core.export{ name:"get_profile_by_email" def:get_profile_by_email }
+
+
+// ----------------------------------------------------------------------------
+// TOPIC
+
+//
+get_topics = data.find { 
+    model: model.ent{ name:"topic" }
+}
+core.export{ name:"get_topics" def:get_topics }
+
+//
+get_topic_by_id( id ) = data.get {
+    model: ent{ name:"topic" }
+    id
+}
+core.export{ name:"get_topic_by_id" def:get_topic_by_id }
+
+// 
+create_topic( text ) = data.set {
+    def: {
+        model: ent{ name:"topic" }
+        create: {
+            text
+        }
+    }
+}
+core.export{ name:"create_topic" def:create_topic }
+
+// 
+remove_topic_by_id( id ) = data.set {
+    def: {
+        model: ent{ name:"topic" }
+        id
+        delete: true
+    }
+}
+core.export{ name:"remove_topic_by_id" def:remove_topic_by_id }
+
+// 
+update_topic( id text ) = data.set {
+    def: {
+        model: ent{ name:"topic" }
+        id
+        update: {
+            text
+        }
+    }
+}
+core.export{ name:"update_topic" def:update_topic }
+
+
+// activate_topic id
+// activate_lobby 
