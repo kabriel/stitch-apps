@@ -154,6 +154,18 @@ main( user ) = ui.app {
         }
     }
 
+    event: ui.event {
+        name: "activate_topic"
+        handler( user inv ): model.activate_topic {
+            topic: core.echo{val: grid.argument{ inv name:"value" } msg:"topic"}
+        }
+    }
+
+    event: ui.event {
+        name: "activate_lobby"
+        handler( user inv ): model.activate_lobby
+    }
+
     /*
     event: ui.event {
         name: "nav_article"

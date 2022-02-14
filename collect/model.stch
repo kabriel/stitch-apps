@@ -34,8 +34,23 @@ init = core.seq {
             type: "text"
         }
     }
+    // session
+    body: data.model {
+        name: ent{ name:"session" }
+        field: {
+            name: "name"
+            type: "text"
+        }
+        field: {
+            name: "topic"
+            type: "link"
+            model: "topic"
+            cardinality: "one"
+        }
+    }
 }
 core.export{ name:"init" def:init }
+
 
 // ----------------------------------------------------------------------------
 // PROFILE
@@ -133,5 +148,41 @@ update_topic( id text ) = data.set {
 core.export{ name:"update_topic" def:update_topic }
 
 
-// activate_topic id
-// activate_lobby 
+// ----------------------------------------------------------------------------
+// SESSION
+
+// 
+get_session = data.set {
+    def: {
+        model: ent{ name:"session" }
+        id: "primary"
+        create: {
+            name: "primary"
+        }
+    }
+}
+core.export{ name:"get_session" def:get_session }
+
+// 
+activate_topic( topic ) = data.set {
+    def: {
+        model: ent{ name:"session" }
+        id: "primary"
+        update: {
+            topic
+        }
+    }
+}
+core.export{ name:"activate_topic" def:activate_topic }
+
+// 
+activate_lobby = data.set {
+    def: {
+        model: ent{ name:"session" }
+        id: "primary"
+        remove: {
+            topic: true
+        }
+    }
+}
+core.export{ name:"activate_lobby" def:activate_lobby }

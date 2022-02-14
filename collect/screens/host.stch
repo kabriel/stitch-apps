@@ -32,6 +32,7 @@ content( profile ) = ui.pane {
         }
     }
     content: create_topic
+    content: active_topic
     content: topic_list
 }
 
@@ -56,6 +57,29 @@ create_topic = ui.pane {
                 val: "close"
                 event: "bus:topic_create_layer1"
             }
+        }
+    }
+}
+
+active_topic = ui.pane {
+    content: ui.text {
+        val: "Active Topic:"
+    }
+    content: core.cond {
+        if: core.exists { 
+            val: core.val {
+                src: model.get_session
+                name: "topic"
+            }
+        } 
+        then: ui.text {
+            val: core.val {
+                src: model.get_session
+                name: "topic.text"
+            }
+        }
+        else: ui.text {
+            val: "<no topic>"
         }
     }
 }
@@ -96,6 +120,25 @@ view_topic( topic ) = ui.pane {
             val: "bus:view_topic_"
             val: topic
             val: "_layer2"
+        }
+    }
+    content: core.cond {
+        if: core.match {
+            source: core.val {
+                src: model.get_session
+                name: "topic"
+            }
+            target: topic
+        }
+        then: ui.link {
+            val: "[deactivate]"
+            event: "activate_lobby"
+            value: topic
+        }
+        else: ui.link {
+            val: "[activate]"
+            event: "activate_topic"
+            value: topic
         }
     }
 }
