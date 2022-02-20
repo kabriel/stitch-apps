@@ -1,12 +1,12 @@
-core.import{ namespace:"home" source:"./screens/home.stch" }
-core.import{ namespace:"host" source:"./screens/host.stch" }
 core.import{ namespace:"auth" source:"./screens/auth.stch" }
+core.import{ namespace:"host" source:"./screens/host.stch" }
+core.import{ namespace:"lobby" source:"./screens/lobby.stch" }
+core.import{ namespace:"topic" source:"./screens/topic.stch" }
 
 
 main( user ) = ui.app {
     name: "collect"    
 
-    //pageName: "auth"
     pageName: is_authed {
         yes: core.cond {
             if: core.exists { 
@@ -21,43 +21,26 @@ main( user ) = ui.app {
             }
             else: is_host {
                 yes: "host"
-                no: "home"
+                no: has_topic {
+                    yes: "topic"
+                    no: "lobby"
+                }
             }
         }
         no: "auth"
     }
 
-
-    // nav
-    //nav: core.match{ source:role target:"user" }
-
-    // pages
-    
     // auth
-    /*
-    page: is_mobile {
-        yes: is_authed {
-            no: mobile_auth.page
-        } 
-    }
-    */
-    // home
-    page: home.page
+    page: auth.page
 
     // host
     page: host.page
 
-    // auth
-    page: auth.page
-    
+    // lobby
+    page: lobby.page
 
-    /*
-    is_mobile {
-        yes: is_authed {
-            yes: mobile_home.page
-        } 
-    }
-    */
+    // topic
+    page: topic.page
 
 
     /*
@@ -240,6 +223,17 @@ is_host( yes no ) = core.cond {
         } 
         target: host_email
     }
+    then: yes
+    else: no
+}
+
+has_topic( yes no ) = core.cond { 
+    if: core.exists { 
+        val: core.val {
+            src: model.get_session
+            name: "topic"
+        }
+    } 
     then: yes
     else: no
 }

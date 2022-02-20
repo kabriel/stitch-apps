@@ -1,0 +1,34 @@
+page( user ) = ui.page {
+    name: "lobby"
+    title: "Collect"
+    content: content {
+        profile: model.get_profile_by_user{ user }
+    }
+}
+core.export{ name:"page" def:page }
+
+content( profile ) = ui.pane {
+    flexDirection: "column"
+    alignItems: "center"
+    marginTop: "50px"
+
+    content: ui.pane {
+        content: ui.text {
+            val: "lobby"
+        }
+    }
+    content: ui.pane {
+        content: ui.link {
+            val: "signout"
+            event: "unauth"
+        }
+    }
+    content: ui.pane {
+        content: ui.text {
+            val: core.val {
+                src: profile
+                name: "owner.name"
+            }
+        }
+    }
+}

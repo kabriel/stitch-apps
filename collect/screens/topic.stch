@@ -1,5 +1,5 @@
 page( user ) = ui.page {
-    name: "home"
+    name: "topic"
     title: "Collect"
     content: content {
         profile: model.get_profile_by_user{ user }
@@ -14,7 +14,7 @@ content( profile ) = ui.pane {
 
     content: ui.pane {
         content: ui.text {
-            val: "home"
+            val: "topic"
         }
     }
     content: ui.pane {
