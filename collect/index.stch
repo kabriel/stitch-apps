@@ -1,4 +1,5 @@
 core.import{ namespace:"scope" source:"https://api.github.com/repos/kabriel/stitch-apps/contents/scope/index.stch" }
+core.import{ namespace:"utils" source:"utils.stch" } 
 core.import{ namespace:"model" source:"model.stch" } 
 core.import{ namespace:"app" source:"app.stch" }
 
