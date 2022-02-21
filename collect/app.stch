@@ -1,13 +1,14 @@
+core.import{ namespace:"items" source:"./components/items.stch" }
+
 core.import{ namespace:"auth" source:"./screens/auth.stch" }
 core.import{ namespace:"host" source:"./screens/host.stch" }
 core.import{ namespace:"lobby" source:"./screens/lobby.stch" }
 core.import{ namespace:"topic" source:"./screens/topic.stch" }
 
-
 main( user ) = ui.app {
     name: "collect"    
 
-    pageName: is_authed {
+    pageName: utils.is_authed {
         yes: core.cond {
             if: core.exists { 
                 val: core.val {
@@ -19,9 +20,9 @@ main( user ) = ui.app {
                 src: model.get_profile_by_user{ user }
                 name: "current_page"
             }
-            else: is_host {
+            else: utils.is_host {
                 yes: "host"
-                no: has_topic {
+                no: utils.has_topic {
                     yes: "topic"
                     no: "lobby"
                 }
@@ -149,105 +150,38 @@ main( user ) = ui.app {
         handler( user inv ): model.activate_lobby
     }
 
-    /*
     event: ui.event {
-        name: "nav_article"
-        trigger_url: "mobile_article"
-        handler( user inv ): model.set_context_article { 
-            article: grid.argument{ inv name:"value" }
-            profile: model.get_profile{ user }
-        }
-    }
-    event: ui.event {
-        name: "nav_app"
-        trigger_url: "mobile_app"
-        handler( user inv ): model.set_context_app { 
-            app: grid.argument{ inv name:"value" }
-            profile: model.get_profile{ user }
-        }
-    }
-    event: ui.event {
-        name: "nav_conversation"
-        trigger_url: "mobile_conversation"
-        handler( user inv ): model.set_context_conversation { 
-            conversation: core.cond {
-                if: core.exists {
-                    val: grid.argument{ inv name:"value" }
-                }
-                then: model.get_conversation {
-                    profile: grid.argument{ inv name:"value" }
-                }
-                else: model.get_conversation {
-                    profile: model.get_profile{ user }
-                }
+        name: "create_item"
+        handler( user inv ): model.create_item {
+            topic: model.get_topic_by_id {
+                id: grid.argument{ inv name:"topic" }
             } 
-            profile: model.get_profile{ user }
-        }
-    }
-    event: ui.event {
-        name: "create_message"
-        handler( user inv ): model.create_message {
-            conversation: core.val {
-                src: model.get_profile{ user }
-                name: "conversation"
-            }
-            profile: model.get_profile{ user }
             text: grid.argument{ inv name:"value" }
         }
     }
+
     event: ui.event {
-        name: "create_my_message"
-        handler( user inv ): model.create_message {
-            conversation:  model.get_conversation {
-                profile: model.get_profile{ user }
-            }
-            profile: model.get_profile{ user }
+        name: "remove_item"
+        handler( user inv ): model.remove_item_by_id {
+            id: grid.argument{ inv name:"value" }
+        }
+    }
+
+    event: ui.event {
+        name: "update_item"
+        handler( user inv ): model.update_item {
+            id: grid.argument{ inv name:"item" }
             text: grid.argument{ inv name:"value" }
         }
     }
-    */
+
+    event: ui.event {
+        name: "rate_item"
+        handler( user inv ): model.rate_item {
+            profile: model.get_profile_by_user{ user }
+            item: grid.argument{ inv name:"item" }
+            score: grid.argument{ inv name:"score" }
+        }
+    }
 }
 core.export{ name:"main" def:main }
-
-is_authed( yes no ) = core.cond {
-    if: core.match{ source:role target:"user" }
-    then: yes
-    else: no
-} 
-
-is_host( yes no ) = core.cond {
-    if: core.match { 
-        source: core.val {
-            src: user
-            name: "email"
-        } 
-        target: host_email
-    }
-    then: yes
-    else: no
-}
-
-has_topic( yes no ) = core.cond { 
-    if: core.exists { 
-        val: core.val {
-            src: model.get_session
-            name: "topic"
-        }
-    } 
-    then: yes
-    else: no
-}
-
-/*
-is_mobile( yes no ) = core.cond {
-    if: core.match{ source:platform target:"mobile" }
-    then: yes
-    else: no
-}
-
-is_embedded( yes no ) = core.cond {
-    if: embedded
-    then: yes
-    else: no
-}
-*/

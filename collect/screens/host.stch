@@ -34,6 +34,7 @@ content( profile ) = ui.pane {
     content: create_topic
     content: active_topic
     content: topic_list
+    content: items.content
 }
 
 create_topic = ui.pane {

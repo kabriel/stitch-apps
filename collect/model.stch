@@ -18,6 +18,13 @@ init = core.seq {
             unique: true
         }
         field: {
+            name: "ratings"
+            type: "link"
+            model: ent{ name:"item_rating" }
+            link: "owner"
+            cardinality: "many"
+        }
+        field: {
             name: "current_page"
             type: "text"
         }
@@ -33,6 +40,13 @@ init = core.seq {
             name: "text"
             type: "text"
         }
+        field: {
+            name: "items"
+            type: "link"
+            model: ent{ name:"item" }
+            link: "topic"
+            cardinality: "many"
+        }
     }
     // session
     body: data.model {
@@ -44,8 +58,56 @@ init = core.seq {
         field: {
             name: "topic"
             type: "link"
-            model: "topic"
+            model: ent{ name:"topic" }
             cardinality: "one"
+        }
+    }
+    // item
+    body: data.model {
+        name: ent{ name:"item" }
+        field: {
+            name: "topic"
+            type: "link"
+            model: ent{ name:"topic" }
+            link: "items"
+            cardinality: "one"
+            required: true
+        }
+        field: {
+            name: "ratings"
+            type: "link"
+            model: ent{ name:"item_rating" }
+            link: "item"
+            cardinality: "many"
+        }
+        field: {
+            name: "text"
+            type: "text"
+        }
+    }
+    // item_rating
+    body: data.model {
+        name: ent{ name:"item_rating" }
+        field: {
+            name: "owner"
+            type: "link"
+            model: ent{ name:"profile" }
+            link: "ratings"
+            cardinality: "one"
+            required: true
+        }
+        field: {
+            name: "item"
+            type: "link"
+            model: ent{ name:"item" }
+            link: "ratings"
+            cardinality: "one"
+            required: true
+        }
+        field: {
+            name: "score"
+            type: "number"
+            required: true
         }
     }
 }
@@ -186,3 +248,111 @@ activate_lobby = data.set {
     }
 }
 core.export{ name:"activate_lobby" def:activate_lobby }
+
+// ----------------------------------------------------------------------------
+// ITEM
+
+//
+get_item_by_id( id ) = data.get {
+    model: ent{ name:"item" }
+    id
+}
+core.export{ name:"get_item_by_id" def:get_item_by_id }
+
+// 
+create_item( topic text ) = data.set {
+    def: {
+        name: "item_a"
+        model: ent{ name:"item" }
+        create: {
+            topic
+            text
+        }
+    }
+    def: {
+        id: topic
+        model: ent{ name:"topic" }
+        add: {
+            items: [
+                "item_a"
+            ]
+        }
+    }
+}
+core.export{ name:"create_item" def:create_item }
+
+// 
+remove_item_by_id( id ) = data.set {
+    def: {
+        name: "item_a"
+        model: ent{ name:"item" }
+        id
+        delete: true
+    }
+    def: {
+        model: ent{ name:"topic" }
+        id: core.val {
+            val: model.get_item_by_id{ id }
+            name: "topic"
+        }
+        remove: {
+            items: [
+                "item_a"
+            ]
+        }
+        
+    }
+}
+core.export{ name:"remove_item_by_id" def:remove_item_by_id }
+
+// 
+update_item( id text ) = data.set {
+    def: {
+        model: ent{ name:"item" }
+        id
+        update: {
+            text
+        }
+    }
+}
+core.export{ name:"update_item" def:update_item }
+
+
+// ----------------------------------------------------------------------------
+// ITEM_RATING
+
+//
+get_item_rating( profile item ) = data.set {
+    def: {
+        model: ent{ name:"item_rating" }
+        find: {
+            fields: {
+                owner: profile
+                item
+            }
+        }
+        create: {
+            owner: profile
+            item
+            score: 0
+        }
+    }
+}
+core.export{ name:"get_item_rating" def:get_item_rating }
+
+//
+rate_item( profile item score ) = data.set {
+    def: {
+        model: ent{ name:"item_rating" }
+        find: {
+            fields: {
+                owner: profile
+                item
+            }
+        }
+        update: {
+            score
+        }
+    }
+}
+core.export{ name:"rate_item" def:rate_item }

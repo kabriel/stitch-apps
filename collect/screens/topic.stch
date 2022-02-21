@@ -31,4 +31,5 @@ content( profile ) = ui.pane {
             }
         }
     }
+    content: items.content
 }

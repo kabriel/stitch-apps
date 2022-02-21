@@ -1,0 +1,31 @@
+is_authed( yes no ) = core.cond {
+    if: core.match{ source:role target:"user" }
+    then: yes
+    else: no
+} 
+core.export{ name:"is_authed" def:is_authed }
+
+is_host( yes no ) = core.cond {
+    if: core.match { 
+        source: core.val {
+            src: user
+            name: "email"
+        } 
+        target: host_email
+    }
+    then: yes
+    else: no
+}
+core.export{ name:"is_host" def:is_host }
+
+has_topic( yes no ) = core.cond { 
+    if: core.exists { 
+        val: core.val {
+            src: model.get_session
+            name: "topic"
+        }
+    } 
+    then: yes
+    else: no
+}
+core.export{ name:"has_topic" def:has_topic }
