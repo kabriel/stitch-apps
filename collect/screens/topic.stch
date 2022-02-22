@@ -9,27 +9,11 @@ core.export{ name:"page" def:page }
 
 content( profile ) = ui.pane {
     flexDirection: "column"
-    alignItems: "center"
-    marginTop: "50px"
-
-    content: ui.pane {
-        content: ui.text {
-            val: "topic"
+    content: header.content {
+        title: core.val {
+            src: model.get_session
+            name: "topic.text"
         }
     }
-    content: ui.pane {
-        content: ui.link {
-            val: "signout"
-            event: "unauth"
-        }
-    }
-    content: ui.pane {
-        content: ui.text {
-            val: core.val {
-                src: profile
-                name: "owner.name"
-            }
-        }
-    }
-    content: items.content
+    content: add_items.content
 }

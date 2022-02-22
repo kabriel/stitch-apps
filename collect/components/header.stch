@@ -1,0 +1,35 @@
+content( user title ) = ui.pane {
+    flexDirection: "row"
+    //backgroundColor: "red"
+    width: "100%"
+    padding: "20px"
+
+    content: ui.pane {
+        flex: 1
+        content: ui.text {
+            val: title
+        }
+    }
+    content: ui.pane {
+        content: view_profile {
+            profile: model.get_profile_by_user{ user }
+        }
+        content: ui.pane {
+            content: ui.link {
+                val: "[Sign Out]"
+                event: "unauth"
+            }
+        }
+    }
+}
+core.export{ name:"content" def:content }
+
+view_profile( profile ) =  ui.pane {
+    paddingRight: "20px"
+    content: ui.text {
+        val: core.val {
+            src: profile
+            name: "owner.name"
+        }
+    }
+}

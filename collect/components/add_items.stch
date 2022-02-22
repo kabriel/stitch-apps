@@ -1,0 +1,161 @@
+content = ui.pane {
+    flexDirection: "column"
+    padding: "20px"
+    flex: 1
+    content: ui.pane {
+        marginBottom: "5px"
+        content: ui.input { 
+            label: "New Item" 
+            autoFocus: true
+            clearOnSubmit: true
+            event: "create_item" 
+            topic: core.val {
+                src: model.get_session
+                name: "topic"
+            }
+        }
+    }
+    content: core.map {
+        collection: user_sorted_topics
+        iterator( item ): view_item{ item } 
+    }
+}
+core.export{ name:"content" def:content }
+
+user_sorted_topics( user ) = core.sort {
+    collection: core.val {
+        src: core.val {
+            src: model.get_session
+            name: "topic"
+        }
+        name: "items"
+    }
+    val( item ): core.val {
+        src: model.get_item_rating {
+            profile: model.get_profile_by_user{ user }
+            item
+        }
+        name: "score"
+    }
+    reverse: true
+}
+
+view_item( item user ) = ui.pane {
+    flex: 1
+    backgroundColor: core.switch {
+        source: core.val {
+            src: model.get_item_rating {
+                profile: model.get_profile_by_user{ user }
+                item
+            }
+            name: "score"
+        }
+        case: core.case {
+            match: -1 
+            then: "#BA3F25"
+        }
+        case: core.case {
+            match: 0
+            then: "gray"
+        }
+        case: core.case {
+            match: 1
+            then: "#05256E"
+        }
+        case: core.case {
+            match: 2
+            then: "#1345BA"
+        }
+        case: core.case {
+            match: 3
+            then: "#3370FF"
+        }
+        default: "purple"
+    }
+    marginBottom: "5px"
+    content: ui.pane {
+        flex: 1
+        padding: "12px"
+        content: ui.text {
+            color: "#ffffff"
+            val: core.val {
+                src: item
+                name: "text"
+            }
+        }
+    } 
+    content: controls { 
+        item_rating: model.get_item_rating {
+            profile: model.get_profile_by_user{ user }
+            item
+        }
+        score: core.val {
+            src: model.get_item_rating {
+                profile: model.get_profile_by_user{ user }
+                item
+            }
+            name: "score"
+        }
+        item 
+    }
+}
+
+controls( item item_rating score user ) = ui.pane {
+    content: ui.button { 
+        icon: core.cond {
+            if: core.gte {
+                op: score
+                op: 1
+            }
+            then: "star"
+            else: "star_border"
+        }
+        color: "#ffffff"
+        event: "rate_item"
+        score: 1
+        item
+    }
+    content: ui.button { 
+        icon: core.cond {
+            if: core.gte {
+                op: score
+                op: 2
+            }
+            then: "star"
+            else: "star_border"
+        }
+        color: "#ffffff"
+        event: "rate_item"
+        score: 2
+        item
+    }
+    content: ui.button { 
+        icon: core.cond {
+            if: core.gte {
+                op: score
+                op: 3
+            }
+            then: "star"
+            else: "star_border"
+        }
+        color: "#ffffff"
+        event: "rate_item"
+        score: 3
+        item
+    }
+    content: ui.button { 
+        icon: "close"
+        color: "#ffffff"
+        event: "rate_item"
+        score: -1 
+        item
+    }
+    content: utils.is_host {
+        yes: ui.button { 
+            icon: "delete" 
+            color: "primary" 
+            event: "remove_item"
+            value: item
+        }
+    }
+}

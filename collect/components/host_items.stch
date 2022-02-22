@@ -1,0 +1,131 @@
+content = ui.pane {
+    flexDirection: "column"
+    flex: 1
+    padding: "20px"
+
+    content: active_topic
+    content: core.map {
+        collection: all_items
+        iterator( item ): view_item{ item } 
+    }
+}
+core.export{ name:"content" def:content }
+
+active_topic = ui.pane {
+   // height: "40px"
+    content: core.cond {
+        if: core.exists { 
+            val: core.val {
+                src: model.get_session
+                name: "topic"
+            }
+        } 
+        then: ui.text {
+            val: core.val {
+                src: model.get_session
+                name: "topic.text"
+            }
+        }
+        else: ui.text {
+            val: "<no topic>"
+        }
+    }
+}
+
+all_items = core.sort {
+    collection: core.val {
+        src: core.val {
+            src: model.get_session
+            name: "topic"
+        }
+        name: "items"
+    }
+    name: "score"
+    reverse: true
+}
+
+view_item( item ) = ui.pane {
+    backgroundColor: "gray"
+    marginBottom: "5px"
+    //flex: 1
+    //flexDirection: "row"
+
+    content: ui.pane {
+        width: "40px"
+        padding: "12px"
+        paddingRight: "10px"
+        content: ui.text {
+            color: "#ffffff"
+            val: core.val {
+                src: item
+                name: "score"
+            }
+        }
+    }
+    content: ui.stack {
+        name: "item_edit"
+        name: item
+        layer1: ui.pane {
+            flex: 1
+            content: ui.pane {
+                flex: 1
+                padding: "12px"
+                content: ui.text {
+                    color: "#ffffff"
+                    val: core.val {
+                        src: item
+                        name: "text"
+                    }
+                }
+            } 
+            content: ui.button {
+                icon: "edit"
+                color: "#ffffff"
+                event: core.string {
+                    val: "bus:item_edit_"
+                    val: item
+                    val: "_layer2"
+                }
+
+            }
+        }
+        layer2: ui.pane {
+            flex: 1
+            content: ui.input { 
+                //label: "Item Text" 
+                value: core.val {
+                    src: item
+                    name: "text"
+                }
+                item
+                event: "update_item" 
+                event: core.string {
+                    val: "bus:item_edit_"
+                    val: item
+                    val: "_layer1"
+                }
+                autoFocus: true
+                clearOnSubmit: true
+            }
+            content: ui.button {
+                icon: "close"
+                color: "#ffffff"
+                event: core.string {
+                    val: "bus:item_edit_"
+                    val: item
+                    val: "_layer1"
+                }
+            }
+        }
+    }
+    content: ui.pane {
+        content: utils.is_host {
+            yes: ui.button { 
+                icon: "delete" 
+                color: "#ffffff"
+                event: "remove_item"
+                value: item
+            }
+        }
+    }
+}

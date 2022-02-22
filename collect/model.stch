@@ -62,29 +62,6 @@ init = core.seq {
             cardinality: "one"
         }
     }
-    // item
-    body: data.model {
-        name: ent{ name:"item" }
-        field: {
-            name: "topic"
-            type: "link"
-            model: ent{ name:"topic" }
-            link: "items"
-            cardinality: "one"
-            required: true
-        }
-        field: {
-            name: "ratings"
-            type: "link"
-            model: ent{ name:"item_rating" }
-            link: "item"
-            cardinality: "many"
-        }
-        field: {
-            name: "text"
-            type: "text"
-        }
-    }
     // item_rating
     body: data.model {
         name: ent{ name:"item_rating" }
@@ -108,6 +85,36 @@ init = core.seq {
             name: "score"
             type: "number"
             required: true
+        }
+    }
+    // item
+    body: data.model {
+        name: ent{ name:"item" }
+        field: {
+            name: "topic"
+            type: "link"
+            model: ent{ name:"topic" }
+            link: "items"
+            cardinality: "one"
+            required: true
+        }
+        field: {
+            name: "ratings"
+            type: "link"
+            model: ent{ name:"item_rating" }
+            link: "item"
+            cardinality: "many"
+        }
+        field: {
+            name: "score"
+            type: "computed"
+            aggregation: "sum"
+            source: "ratings.score"
+            target: "item"
+        }
+        field: {
+            name: "text"
+            type: "text"
         }
     }
 }

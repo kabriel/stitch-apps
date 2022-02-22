@@ -1,4 +1,7 @@
-core.import{ namespace:"items" source:"./components/items.stch" }
+core.import{ namespace:"add_items" source:"./components/add_items.stch" }
+core.import{ namespace:"host_items" source:"./components/host_items.stch" }
+core.import{ namespace:"host_topics" source:"./components/host_topics.stch" }
+core.import{ namespace:"header" source:"./components/header.stch" }
 
 core.import{ namespace:"auth" source:"./screens/auth.stch" }
 core.import{ namespace:"host" source:"./screens/host.stch" }
@@ -44,67 +47,15 @@ main( user ) = ui.app {
     page: topic.page
 
 
-    /*
     // theme
     theme: ui.theme {
         palette: {
-            primary: "#59E0C3"
-            secondary: "#F86666"
-            background: {
-                dark: "#1C1C1C"
-                main: "#FBFAFF"
-                light: "#FFFFFF"
-            }
+            primary: "#76b900"
+            secondary: "#b90075"
         }
-        typography: {
-            h1: {
-                fontSize: 48
-                fontWeight: 600
-                fontFamily: "Montserrat"
-                lineHeight: 1.5
+    }
 
-
-            }
-            h2: {
-                fontSize: 24
-                fontWeight: 600
-                fontFamily: "Montserrat"
-                lineHeight: 1.5
-            }
-            h3: {
-                fontSize: 18
-                fontWeight: 300
-                fontFamily: "Montserrat"
-                lineHeight: 1.5
-            }
-            h4: {
-                fontSize: 13
-                fontWeight: 300
-                lineHeight: 1.5
-            }
-            h5: {
-                fontSize: 13
-                fontWeight: 300
-                lineHeight: 1.5
-            }
-            h6: {
-                fontSize: 13
-                fontWeight: 700
-                lineHeight: 1.5
-            }
-            body1: {
-                fontWeight: 300
-                fontSize: 17
-                lineHeight: 1.5
-            }
-            body2: {
-                fontWeight: 500
-                fontSize: 17
-                lineHeight: 1.5
-            }
-        }
-        */
-
+    // events
 
     event: ui.event {
         name: "switch_auth"

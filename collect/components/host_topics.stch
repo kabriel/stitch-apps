@@ -1,0 +1,136 @@
+content = ui.pane {
+    flexDirection: "column"
+    flex: 1
+    padding: "20px"
+
+    content: create_topic
+    content: topic_list
+}
+core.export{ name:"content" def:content }
+
+create_topic = ui.pane {
+    content: ui.stack {
+        name: "topic_create"
+        layer1: ui.pane {
+            content: ui.button {
+                icon: "add"
+                event: "bus:topic_create_layer2"
+            }
+        }
+        layer2: ui.pane {
+            flex: 1
+            height: "58px"
+
+            content: ui.input { 
+                label: "Topic Text" 
+                event: "create_topic" 
+                event: "bus:topic_create_layer1"
+                autoFocus: true
+                clearOnSubmit: true
+            }
+            content: ui.button {
+                icon: "close"
+                event: "bus:topic_create_layer1"
+            }
+        }
+    }
+}
+
+topic_list = ui.pane {
+    flex: 1
+    flexDirection: "column"
+    content: core.map {
+        collection: model.get_topics
+        iterator( item ): topic_element{ topic:item }
+    }
+}
+
+topic_element( topic ) = ui.stack {
+    name: "view_topic"
+    name: topic
+    layer1: view_topic{ topic }
+    layer2: edit_topic{ topic }
+}
+
+view_topic( topic ) = ui.pane {
+    backgroundColor: "gray"
+    marginBottom: "5px"
+
+    content: ui.pane {
+        flex: 1
+        padding: "12px"
+        content: ui.text {
+            color: "#ffffff"
+            val: core.val {
+                src: topic
+                name: "text"
+            }
+        }
+    }
+    content: ui.button {
+        icon: "edit"
+        color: "#ffffff"
+        event: core.string {
+            val: "bus:view_topic_"
+            val: topic
+            val: "_layer2"
+        }
+    }
+    content: ui.button {
+        icon: "delete"
+        color: "#ffffff"
+        event: "remove_topic"
+        value: topic
+    }
+    content: core.cond {
+        if: core.match {
+            source: core.val {
+                src: model.get_session
+                name: "topic"
+            }
+            target: topic
+        }
+        then: ui.button {
+            icon: "radio_button_checked"
+            color: "#ffffff"
+            event: "activate_lobby"
+            value: topic
+        }
+        else: ui.button {
+            icon: "radio_button_unchecked"
+            color: "#ffffff"
+            event: "activate_topic"
+            value: topic
+        }
+    }
+}
+
+edit_topic( topic ) = ui.pane {
+    backgroundColor: "gray"
+    marginBottom: "5px"
+
+    content: ui.input{ 
+        value: core.val {
+            src: topic
+            name: "text"
+        }
+        topic
+        event: "update_topic" 
+        event: core.string {
+            val: "bus:view_topic_"
+            val: topic
+            val: "_layer1"
+        }
+        autoFocus: true
+        clearOnSubmit: true
+    }
+    content: ui.button {
+        icon: "close"
+        color: "#ffffff"
+        event: core.string {
+            val: "bus:view_topic_"
+            val: topic
+            val: "_layer1"
+        }
+    }
+}
