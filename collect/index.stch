@@ -12,8 +12,8 @@ http.listen {
     port: 8000
     handler: ui.handler
     handler: grid.handler {
-        //baseUrl: core.param{ name:"baseUrl" default:"http://localhost:8000" }
-        baseUrl: "http://10.0.0.195.nip.io:8000"
+        baseUrl: core.param{ name:"baseUrl" default:"http://localhost:8000" }
+        // baseUrl: "http://10.0.0.195.nip.io:8000"
         provider: user.provider {
             name: "twitter"
             key: "JM3Ha3DgdRkAqinXib1vICXBv"
