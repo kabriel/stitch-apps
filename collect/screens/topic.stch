@@ -15,5 +15,15 @@ content( profile ) = ui.pane {
             name: "topic.text"
         }
     }
-    content: add_items.content
+    content: core.cond {
+        if: core.match {
+            source: core.val {
+                src: model.get_session
+                name: "topic.mode"
+            }
+            target: "results"
+        }
+        then: view_items.content
+        else: add_items.content
+    }
 }

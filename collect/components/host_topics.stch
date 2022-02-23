@@ -67,6 +67,29 @@ view_topic( topic ) = ui.pane {
             }
         }
     }
+    content: core.cond {
+        if: core.match {
+            source: core.val {
+                src: topic
+                name: "mode"
+            }
+            target: "results"
+        }
+        then: ui.button {
+            icon: "check_box"
+            color: "#ffffff"
+            event: "update_topic_mode"
+            value: "open"
+            topic
+        }
+        else: ui.button {
+            icon: "check_box_outline_blank"
+            color: "#ffffff"
+            event: "update_topic_mode"
+            value: "results"
+            topic
+        }
+    }
     content: ui.button {
         icon: "edit"
         color: "#ffffff"
@@ -115,7 +138,7 @@ edit_topic( topic ) = ui.pane {
             name: "text"
         }
         topic
-        event: "update_topic" 
+        event: "update_topic_text" 
         event: core.string {
             val: "bus:view_topic_"
             val: topic

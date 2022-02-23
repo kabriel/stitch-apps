@@ -1,0 +1,50 @@
+content = ui.pane {
+    flexDirection: "column"
+    padding: "20px"
+    flex: 1
+    content: core.map {
+        collection: all_items
+        iterator( item ): view_item{ item } 
+    }
+}
+core.export{ name:"content" def:content }
+
+all_items = core.sort {
+    collection: core.filter {
+        collection: core.val {
+            src: core.val {
+                src: model.get_session
+                name: "topic"
+            }
+            name: "items"
+        }
+        iterator( item ): core.gte {
+            op: core.val {
+                src: item
+                name: "score"
+            }
+            op: 0
+        }
+    }
+    name: "score"
+    reverse: true
+}
+
+view_item( item ) = ui.pane {
+    backgroundColor: "#76b900"
+    marginBottom: "5px"
+    content: ui.pane {
+        flex: 1
+        content: ui.pane {
+            flex: 1
+            padding: "12px"
+            content: ui.text {
+                color: "#ffffff"
+                val: core.val {
+                    src: item
+                    name: "text"
+                }
+            }
+        } 
+    }
+}

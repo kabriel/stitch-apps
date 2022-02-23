@@ -47,6 +47,10 @@ init = core.seq {
             link: "topic"
             cardinality: "many"
         }
+        field: {
+            name: "mode"
+            type: "text"
+        }
     }
     // session
     body: data.model {
@@ -205,7 +209,7 @@ remove_topic_by_id( id ) = data.set {
 core.export{ name:"remove_topic_by_id" def:remove_topic_by_id }
 
 // 
-update_topic( id text ) = data.set {
+update_topic_text( id text ) = data.set {
     def: {
         model: ent{ name:"topic" }
         id
@@ -214,7 +218,19 @@ update_topic( id text ) = data.set {
         }
     }
 }
-core.export{ name:"update_topic" def:update_topic }
+core.export{ name:"update_topic_text" def:update_topic_text }
+
+//
+update_topic_mode( id mode ) = data.set {
+    def: {
+        model: ent{ name:"topic" }
+        id
+        update: {
+            mode
+        }
+    }
+}
+core.export{ name:"update_topic_mode" def:update_topic_mode }
 
 
 // ----------------------------------------------------------------------------

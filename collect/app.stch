@@ -1,6 +1,7 @@
 core.import{ namespace:"add_items" source:"./components/add_items.stch" }
 core.import{ namespace:"host_items" source:"./components/host_items.stch" }
 core.import{ namespace:"host_topics" source:"./components/host_topics.stch" }
+core.import{ namespace:"view_items" source:"./components/view_items.stch" }
 core.import{ namespace:"header" source:"./components/header.stch" }
 
 core.import{ namespace:"auth" source:"./screens/auth.stch" }
@@ -82,10 +83,18 @@ main( user ) = ui.app {
     }
 
     event: ui.event {
-        name: "update_topic"
-        handler( user inv ): model.update_topic {
+        name: "update_topic_text"
+        handler( user inv ): model.update_topic_text {
             id: grid.argument{ inv name:"topic" }
             text: grid.argument{ inv name:"value" }
+        }
+    }
+
+    event: ui.event {
+        name: "update_topic_mode"
+        handler( user inv ): model.update_topic_mode {
+            id: grid.argument{ inv name:"topic" }
+            mode: grid.argument{ inv name:"value" }
         }
     }
 
