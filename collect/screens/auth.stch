@@ -28,7 +28,8 @@ content( profile ) = ui.pane {
     }
     content: ui.pane {
         marginTop: "20px"
-        content: ui.input{ 
+        content: ui.input { 
+            name: "input_name"
             label: "Your Name" 
             event: "switch_auth" 
             autoFocus: true
